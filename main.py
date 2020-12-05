@@ -19,7 +19,7 @@ def rgb_to_YCbCr(img):
     #         img[i, j][1] = (-0.1687*r - 0.3313*g + 0.5*b) + 128  # Cb
     #         img[i, j][2] = (0.5*r - 0.4187*g - 0.0813*b) + 128  # Cr
 
-    r, g, b = cv2.split(img)  # Get RGB values from image channels
+    r,g,b = cv2.split(img)  # Get RGB values from image channels
 
     img[:, :, 0] = 0.299 * r + 0.587 * g + 0.114 * b  # Y
     img[:, :, 1] = (-0.1687 * r - 0.3313 * g + 0.5 * b) + 128  # Cb
@@ -37,6 +37,21 @@ def downsample_CbCr(img, n):
     return [np.float32(img[:,:,0]), np.float32(cb_sub), np.float32(cr_sub)]
 
 def YCbCr_to_rgb(img_YCbCr):
+    # original_width = img_YCbCr[0].shape[1]
+    #
+    # img_YCbCr[1] = imutils.resize(img_YCbCr[1], width=original_width)
+    # img_YCbCr[2] = imutils.resize(img_YCbCr[2], width=original_width)
+    #
+    # output = np.asarray(img_YCbCr)
+    # output = np.transpose(output, (1, 2, 0))
+    #
+    # xform = np.array([[1, 0, 1.402], [1, -0.34414, -.71414], [1, 1.772, 0]])
+    # rgb = output.astype(np.float)
+    # rgb[:,:,[1,2]] -= 128
+    # rgb = rgb.dot(xform.T)
+    # np.putmask(rgb, rgb > 255, 255)
+    # np.putmask(rgb, rgb < 0, 0)
+    # return np.uint8(rgb)
     original_width = img_YCbCr[0].shape[1]
 
     img_YCbCr[1] = imutils.resize(img_YCbCr[1], width=original_width)
@@ -45,31 +60,20 @@ def YCbCr_to_rgb(img_YCbCr):
     output = np.asarray(img_YCbCr)
     output = np.transpose(output, (1, 2, 0))
 
-    xform = np.array([[1, 0, 1.402], [1, -0.34414, -.71414], [1, 1.772, 0]])
     rgb = output.astype(np.float)
-    rgb[:,:,[1,2]] -= 128
-    rgb = rgb.dot(xform.T)
+
+    y = output[:, :, 0]
+    cb = output[:, :, 1] - 128
+    cr = output[:, :, 2] - 128
+
+    rgb[:, :, 0] = y + 1.402*cr
+    rgb[:, :, 1] = y - 0.34414*cb - 0.71414*cr
+    rgb[:, :, 2] = y + 1.772*cb
+
     np.putmask(rgb, rgb > 255, 255)
     np.putmask(rgb, rgb < 0, 0)
+
     return np.uint8(rgb)
-    # original_width = img_YCbCr[0].shape[1]
-    #
-    # img_YCbCr[1] = imutils.resize(img_YCbCr[1], width=original_width)
-    # img_YCbCr[2] = imutils.resize(img_YCbCr[2], width=original_width)
-    #
-    # output = np.asarray(img_YCbCr)
-    #
-    # y = output[:, :, 0]
-    # cb = output[:, :, 1] - 128
-    # cr = output[:, :, 2] - 128
-    #
-    # output[:, :, 0] = y + (1.402 * cr)
-    # output[:, :, 1] = y - (0.34414 * cb - 0.71414 * cr)
-    # output[:, :, 2] = y + (1.772 * cb)
-    #
-    # output = np.transpose(output, (1,2,0))
-    #
-    # return output.astype(np.uint8)
 
 def dtc_blocks(img_YCbCr):
 
@@ -96,6 +100,8 @@ def dtc_blocks(img_YCbCr):
                     block = np.trunc(block / util.Qchrom)
 
                 img_YCbCr[n][i, j] = block
+
+    print("poop")
 
 def inverse_dtc_blocks(img_YCbCr):
     for n in range(3):
@@ -167,7 +173,7 @@ dtc_blocks(img_YCbCr)
 
 inverse_dtc_blocks(img_YCbCr)
 
-img_YCbCr = YCbCr_to_rgb(img_YCbCr)
+output_rgb = YCbCr_to_rgb(img_YCbCr)
 
 
 # plt.figure(figsize=(6.4*5, 4.8*5), constrained_layout=False)
@@ -185,7 +191,7 @@ img_YCbCr = YCbCr_to_rgb(img_YCbCr)
 original = cv2.resize(original, (1440, 1080))
 cv2.imshow('Original', original)
 
-img_YCbCr = cv2.resize(img_YCbCr, (1440, 1080))
-cv2.imshow('compressed out', img_YCbCr)
+output_rgb = cv2.resize(output_rgb, (1440, 1080))
+cv2.imshow('compressed out', output_rgb)
 
 cv2.waitKey(0)
