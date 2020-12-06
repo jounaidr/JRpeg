@@ -165,6 +165,9 @@ def encode_quantised_dct_img(img):
                 encoded_list[n] += zigzag_block(block)
 
         print(min(encoded_list[n]), " + ", max(encoded_list[n]))
+
+        encoded_list[n] = list(map(int, encoded_list[n]))
+
         encoded_list[n] = [[len(list(group)), key] for key, group in groupby(encoded_list[n])]
         encoded_list[n].extend([block_height,block_width])
 
@@ -221,7 +224,6 @@ print(getsizeof(original))
 
 img_YCbCr = rgb_to_YCbCr(img)
 
-#img = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
 
 img_YCbCr = downsample_CbCr(img_YCbCr, 2)
 
@@ -229,13 +231,13 @@ dtc_blocks(img_YCbCr)
 
 encode_quantised_dct_img(img_YCbCr)
 
-decode_quantised_dct_img()
-
-ya_boi_did_it = decode_quantised_dct_img()
-
-ya_boi_did_it = inverse_dtc_blocks(ya_boi_did_it)
-
-output_rgb = YCbCr_to_rgb(ya_boi_did_it)
+# decode_quantised_dct_img()
+#
+# ya_boi_did_it = decode_quantised_dct_img()
+#
+# ya_boi_did_it = inverse_dtc_blocks(ya_boi_did_it)
+#
+# output_rgb = YCbCr_to_rgb(ya_boi_did_it)
 
 # plt.figure(figsize=(6.4*5, 4.8*5), constrained_layout=False)
 # plt.subplot(1,3,1)
@@ -252,7 +254,7 @@ output_rgb = YCbCr_to_rgb(ya_boi_did_it)
 # original = cv2.resize(original, (1440, 1080))
 # cv2.imshow('Original', original)
 
-output_rgb = cv2.resize(output_rgb, (1440, 1080))
-cv2.imshow('compressed out', output_rgb)
+# output_rgb = cv2.resize(output_rgb, (1440, 1080))
+# cv2.imshow('compressed out', output_rgb)
 
 cv2.waitKey(0)
