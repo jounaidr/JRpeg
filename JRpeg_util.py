@@ -26,3 +26,30 @@ zigzag_idx = np.array([[0,1,5,6,14,15,27,28],
                        [20,22,33,38,46,51,55,60],
                        [21,34,37,47,50,56,59,61],
                        [35,36,48,49,57,58,62,63]])
+
+
+def zigzag_block(block):
+    # Initialise an empty list of size 64
+    block_string = [None] * 64
+
+    for i in range(8):
+        for j in range(8):
+            # Set the (i,j) element in the block to the position in the block_string defined by (i,j) element from zigzag_idx
+            block_string[zigzag_idx[i][j]] = block[i][j]
+
+    return block_string  # Return the zigzag'd block as single list
+
+
+def un_zigzag_block(block_list):
+    # Generate an empty 8x8 block
+    block = np.zeros((8,8))
+
+    # For each element in the block...
+    for i in range(8):
+        for j in range(8):
+            # ...set the (i,j) element of the block
+            # ...To the element from the block_list with the corresponding index...
+            # ...define by (i,j) zigzag_idx
+            block[i,j] = block_list[zigzag_idx[i][j]]
+
+    return block  # Return the formatted 8x8 block

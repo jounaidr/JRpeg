@@ -219,8 +219,8 @@ def decode_quantised_dct_img():
 
 
 
-# img = cv2.imread("./bpm-img/IC1.bmp")
-# original = cv2.imread("./bpm-img/IC1.bmp")
+# img = cv2.imread("./bmp-img/IC1.bmp")
+# original = cv2.imread("./bmp-img/IC1.bmp")
 #
 # pickle.dump(original, open("original.bin", "wb"))
 # print(getsizeof(original))
@@ -234,7 +234,6 @@ def decode_quantised_dct_img():
 #
 # encode_quantised_dct_img(img_YCbCr)
 
-decode_quantised_dct_img()
 
 ya_boi_did_it = decode_quantised_dct_img()
 
