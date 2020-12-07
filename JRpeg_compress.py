@@ -1,4 +1,4 @@
-# @author jounaidr
+# Author: jounaidr
 # Source: https://github.com/jounaidr/JRpeg
 #
 # Permission is hereby granted, free of charge, to any person obtaining
