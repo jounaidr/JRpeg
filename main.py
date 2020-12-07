@@ -111,7 +111,7 @@ def dtc_blocks(img_YCbCr):
     print("poop")
 
 
-def inverse_dtc_blocks(img_YCbCr):
+def inverse_dtc_blocks(img_YCbCr, QL_rate, QC_rate):
 
     for n in range(3):
 
@@ -195,6 +195,9 @@ def decode_quantised_dct_img():
         block_width = compressed_img[i].pop()
         block_height = compressed_img[i].pop()
 
+        QC_rate = compressed_img[i].pop()
+        QL_rate = compressed_img[i].pop()
+
         out_blocks = np.zeros((block_height,block_width,8,8))
         for j in range(len(compressed_img[i])):
             num, value = compressed_img[i][j]
@@ -211,7 +214,6 @@ def decode_quantised_dct_img():
                 pos = pos + 1
 
         encoded_list[i] = out_blocks
-        print("yeet")
 
     return encoded_list
 

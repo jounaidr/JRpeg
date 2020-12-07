@@ -60,8 +60,6 @@ def dtc_and_quantise_img(img, QL_rate, QC_rate):
 
         # Get height and width of image
         height, width = img[n].shape[:2]
-        mod1 = (height % 8)
-        mod2 = (width % 8)
         if ((height % 8) > 0) or ((width % 8) > 0):
             # Adjust height and width so they are a multiple of 8
             img[n] = img[n][:len(img[n]) -(height % 8), :len(img[n][0]) -(width % 8)]
@@ -91,8 +89,8 @@ def dtc_and_quantise_img(img, QL_rate, QC_rate):
     return img #  Return split, dct and quantised image
 
 
-def encode_and_save_quantised_dct_img(img_blocks, filename):
-    #  Initialise new empty three channel list
+def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
+    # Initialise new empty three channel list
     encoded_list = [[], [], []]
 
     # For each channel (Y,Cb and Cr)
@@ -112,8 +110,10 @@ def encode_and_save_quantised_dct_img(img_blocks, filename):
         encoded_list[n] = list(map(int, encoded_list[n]))
         # RLE style grouping of elements, will create tuples of (amount, value), for example [0,0,0,0] -> (4, 0)
         encoded_list[n] = [[len(list(group)), key] for key, group in groupby(encoded_list[n])]
-        # Append list with meta data (block height, block width, QLrate and QCrate)
-        encoded_list[n].extend([block_height,block_width])
+        # Append channel with meta data for block height and block width, QLrate and QCrate
+        encoded_list[n].extend([ block_height, block_width])
+    # Append luminance channel with meta data for block QLrate and QCrate
+    encoded_list[0].extend([QL_rate, QC_rate])
 
     # Save list to binary file
     pickle.dump(encoded_list, open(filename, "wb"))
@@ -135,10 +135,11 @@ def zigzag_block(block):
 
 # Default params:
 #   -cbcr_downsize_rate=2, any higher will be noticeable, and greater than 5 will give diminishing reduction in file size
-#   -QL_rate=1, standard JPEG luminance quantisation
-def JRpeg_compress(input_filename, output_filename="encoded_img", cbcr_downsize_rate=2, QL_rate=16, QC_rate=1):
-    # Read in original image as RGB three channel array
+#   -QL_rate=1, standard JPEG luminance quantisation todo: UPDATE THIS COMMENT WHEN SHITS FIXED LMAO
+def JRpeg_compress(input_filename, output_filename="encoded_img", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
+    # Read in original image as RGB three channel array and save a resized copy for display later
     original_img = cv2.imread(input_filename)
+    resized_original_img = cv2.resize(original_img, (1440, 1080))
     print("Original image in memory size: ",getsizeof(original_img),"bytes")
 
     # Convert image to YCbCr and downsample Cb and Cr channels
@@ -149,10 +150,14 @@ def JRpeg_compress(input_filename, output_filename="encoded_img", cbcr_downsize_
     # Convert YCbCr image into 8x8 blocks and calculate dct on each block, then quantise each block
     quantised_dct_img = dtc_and_quantise_img(img_YCbCr_downsampled, QL_rate, QC_rate)
     # Encode quantised dct YCbCr image with RLE grouping, and save to a binary file
-    encoded_img = encode_and_save_quantised_dct_img(quantised_dct_img, (output_filename + ".bin"))
+    encoded_img = encode_and_save_quantised_dct_img(quantised_dct_img, QL_rate, QC_rate, (output_filename + ".bin"))
 
     # Print in memory size of encoded list in bytes
     print("Encoded image in memory size: ",getsizeof(encoded_img),"bytes")
+
+    # Display original input image
+    cv2.imshow('Original Image', resized_original_img)
+    cv2.waitKey(0)
 
 
 JRpeg_compress("./bpm-img/IC1.bmp") #TODO: add qlrate and qcrate to encoder and pull out in decoder!!!!!!!!!!!!!!!!!!!!!!!!!!!
