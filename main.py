@@ -9,7 +9,7 @@ from itertools import groupby
 from sys import getsizeof
 import pickle
 
-import util
+import JRpeg_util
 
 
 def rgb_to_YCbCr(img):
@@ -58,10 +58,11 @@ def YCbCr_to_rgb(img_YCbCr):
     # np.putmask(rgb, rgb > 255, 255)
     # np.putmask(rgb, rgb < 0, 0)
     # return np.uint8(rgb)
-    original_width = img_YCbCr[0].shape[1]
 
-    img_YCbCr[1] = imutils.resize(img_YCbCr[1], width=original_width)
-    img_YCbCr[2] = imutils.resize(img_YCbCr[2], width=original_width)
+    original_height, original_width = img_YCbCr[0].shape[:2]
+
+    img_YCbCr[1] = cv2.resize(img_YCbCr[1], (original_width, original_height))
+    img_YCbCr[2] = cv2.resize(img_YCbCr[2], (original_width, original_height))
 
     output = np.asarray(img_YCbCr)
     output = np.transpose(output, (1, 2, 0))
@@ -101,9 +102,9 @@ def dtc_blocks(img_YCbCr):
                 block = cv2.dct(block)
 
                 if n == 0:
-                    block = np.trunc(block / util.Qlum)
+                    block = np.trunc(block / JRpeg_util.Qlum)
                 else:
-                    block = np.trunc(block / util.Qchrom)
+                    block = np.trunc(block / JRpeg_util.Qchrom)
 
                 img_YCbCr[n][i, j] = block
 
@@ -121,9 +122,9 @@ def inverse_dtc_blocks(img_YCbCr):
                 block = img_YCbCr[n][i, j]
 
                 if n == 0:
-                    block = block * util.Qlum
+                    block = block * JRpeg_util.Qlum
                 else:
-                    block = block * util.Qchrom
+                    block = block * JRpeg_util.Qchrom
 
                 block = cv2.dct(block, flags=1)
                 block = block + 128
@@ -145,7 +146,7 @@ def zigzag_block(block):
 
     for i in range(height):
         for j in range(width):
-            block_string[util.zigzag_idx[i][j]] = block[i][j]
+            block_string[JRpeg_util.zigzag_idx[i][j]] = block[i][j]
 
     return block_string
 
@@ -182,12 +183,12 @@ def un_zigzag_block(block_string):
 
     for i in range(8):
         for j in range(8):
-            block[i,j] = block_string[util.zigzag_idx[i][j]]
+            block[i,j] = block_string[JRpeg_util.zigzag_idx[i][j]]
 
     return block
 
 def decode_quantised_dct_img():
-    compressed_img = pickle.load(open("encoded.bin", "rb"))
+    compressed_img = pickle.load(open("encoded_img.bin", "rb"))
     encoded_list = [[], [], []]
 
     for i in range(3):
@@ -216,28 +217,28 @@ def decode_quantised_dct_img():
 
 
 
-img = cv2.imread("./bpm-img/IC1.bmp")
-original = cv2.imread("./bpm-img/IC1.bmp")
-
-pickle.dump(original, open("original.bin", "wb"))
-print(getsizeof(original))
-
-img_YCbCr = rgb_to_YCbCr(img)
-
-
-img_YCbCr = downsample_CbCr(img_YCbCr, 2)
-
-dtc_blocks(img_YCbCr)
-
-encode_quantised_dct_img(img_YCbCr)
-
-# decode_quantised_dct_img()
+# img = cv2.imread("./bpm-img/IC1.bmp")
+# original = cv2.imread("./bpm-img/IC1.bmp")
 #
-# ya_boi_did_it = decode_quantised_dct_img()
+# pickle.dump(original, open("original.bin", "wb"))
+# print(getsizeof(original))
 #
-# ya_boi_did_it = inverse_dtc_blocks(ya_boi_did_it)
+# img_YCbCr = rgb_to_YCbCr(img)
 #
-# output_rgb = YCbCr_to_rgb(ya_boi_did_it)
+#
+# img_YCbCr = downsample_CbCr(img_YCbCr, 2)
+#
+# dtc_blocks(img_YCbCr)
+#
+# encode_quantised_dct_img(img_YCbCr)
+
+decode_quantised_dct_img()
+
+ya_boi_did_it = decode_quantised_dct_img()
+
+ya_boi_did_it = inverse_dtc_blocks(ya_boi_did_it)
+
+output_rgb = YCbCr_to_rgb(ya_boi_did_it)
 
 # plt.figure(figsize=(6.4*5, 4.8*5), constrained_layout=False)
 # plt.subplot(1,3,1)
@@ -254,7 +255,7 @@ encode_quantised_dct_img(img_YCbCr)
 # original = cv2.resize(original, (1440, 1080))
 # cv2.imshow('Original', original)
 
-# output_rgb = cv2.resize(output_rgb, (1440, 1080))
-# cv2.imshow('compressed out', output_rgb)
+output_rgb = cv2.resize(output_rgb, (1440, 1080))
+cv2.imshow('compressed out', output_rgb)
 
 cv2.waitKey(0)
