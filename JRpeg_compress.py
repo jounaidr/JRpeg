@@ -88,11 +88,13 @@ def dtc_and_quantise_img(img, QL_rate, QC_rate):
                 block = cv2.dct((np.float32(block) - 128))
 
                 if ch == 0:
-                    #  If Y channel divide by luminance_quantisation_matrix x luminance_quantisation_rate
-                    block = np.trunc(block / (JRpeg_util.Qlum * QL_rate))
+                    #  If Y channel divide by luminance_quantisation_matrix x luminance_quantisation_rate (if not 0)
+                    if QL_rate <= 0:
+                        block = np.trunc(block / (JRpeg_util.Qlum * QL_rate))
                 else:
-                    #  If Cb or Cr channels divide by chrominance_quantisation_matrix x chrominance_quantisation_rate
-                    block = np.trunc(block / (JRpeg_util.Qchrom * QC_rate))
+                    #  If Cb or Cr channels divide by chrominance_quantisation_matrix x chrominance_quantisation_rate (if not 0)
+                    if QC_rate <= 0:
+                        block = np.trunc(block / (JRpeg_util.Qchrom * QC_rate))
                 # Set adjusted block in image
                 img[ch][i, j] = block
 
@@ -171,5 +173,5 @@ def JRpeg_compress(input_filename, output_filename="encoded_img", cbcr_downsize_
 
 
 
-JRpeg_compress("bmp-img/IC1.bmp")
+# JRpeg_compress("bmp-img/IC1.bmp")
 # TODO: Add debug logging to methods
