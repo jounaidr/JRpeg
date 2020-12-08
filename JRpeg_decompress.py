@@ -38,6 +38,7 @@ logging.basicConfig(
 
 def load_and_decode_quantised_dct_img(filename):
     # Load JRpeg binary file
+    # TODO: Add functionality so that only .jrpg files can be loaded, else throw error and exit
     compressed_img = pickle.load(open(filename, "rb"))
 
     # Initialise new empty three channel list
@@ -148,10 +149,10 @@ def YCbCr_to_rgb(YCbCr):
     return np.uint8(rgb_out)  # Return RGB image as unit8 (8 bit unsigned integer)
 
 
-def JRpeg_decompress(input_filename="JRpeg_encoded_img.bin", original_filename="JRpeg_encoded_img_bmp_copy.bmp"):
+def JRpeg_decompress(input_filename="JRpeg_encoded_img", original_filename="JRpeg_encoded_img_bmp_copy.bmp"):
     # Load the JRpeg file into a YCbCr list, extract the metadata, and format each channel into 8x8 blocks
     logging.info("Loading and decoding JRpeg file: {} ...".format(input_filename))
-    decoded_list_with_metadata = load_and_decode_quantised_dct_img(input_filename)
+    decoded_list_with_metadata = load_and_decode_quantised_dct_img(input_filename + ".jrpg")
     logging.info("... YCbCr loaded and decoded successfully!")
 
     # Inverse dct/quantise the YCbCr image

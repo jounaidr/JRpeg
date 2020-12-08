@@ -29,7 +29,7 @@ JRpeg_metrics = [0,0,0,0]
 JRpeg_mse_val = 0
 
 
-def JRpeg_compress_and_metrics(input_filename, output_filename="JRpeg_encoded_img.bin", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
+def JRpeg_compress_and_metrics(input_filename, output_filename="JRpeg_encoded_img.jrpg", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
     global JRpeg_metrics
     JRpeg_metrics = JRpeg_compress(input_filename, output_filename, cbcr_downsize_rate, QL_rate, QC_rate)
 
@@ -62,10 +62,10 @@ c_input_filename = StringVar()
 c_input_filename.set("bmp-img/IC1.bmp")
 
 d_input_filename = StringVar()
-d_input_filename.set("JRpeg_encoded_img.bin")
+d_input_filename.set("JRpeg_encoded_img")
 
 output_filename = StringVar()
-output_filename.set("JRpeg_encoded_img.bin")
+output_filename.set("JRpeg_encoded_img")
 
 cbcr_downsize_rate = IntVar()
 cbcr_downsize_rate.set(2)
@@ -107,10 +107,10 @@ JRpeg_mse.set("N/A")
 
 JRpeg_comp_label = Label(root, text="JRpeg Compression:", font='Helvetica 12 bold' )
 
-c_input_filename_label = Label(root, text ='Input Filename:')
+c_input_filename_label = Label(root, text ='Original Image Filename:')
 c_input_filename_input = Entry(root, textvariable = c_input_filename)
 
-output_filename_label = Label(root, text = 'Output Filename:')
+output_filename_label = Label(root, text = 'JRpeg Image Filename:')
 output_filename_input = Entry(root, justify='left', textvariable = output_filename)
 
 cbcr_downsize_rate_label = Label(root, text = 'CbCr Downsize Rate:')
@@ -140,7 +140,7 @@ JRpeg_inmem_ratio_input = Entry(root, textvariable = JRpeg_inmem_ratio)
 JRpeg_inmem_space_label = Label(root, text ='Space saved:')
 JRpeg_inmem_space_input = Entry(root, textvariable = JRpeg_inmem_space)
 
-JRpeg_mse_label = Label(root, text ='MSE:')
+JRpeg_mse_label = Label(root, text ='Mean Squared Error:')
 JRpeg_mse_input = Entry(root, textvariable = JRpeg_mse)
 
 # JRpeg on disk metrics
@@ -163,7 +163,7 @@ JRpeg_disk_space_input = Entry(root, textvariable = JRpeg_disk_space)
 
 JRpeg_decomp_label = Label(root, text="JRpeg Decompression:", font='Helvetica 12 bold')
 
-d_input_filename_label = Label(root, text ='Input Filename:')
+d_input_filename_label = Label(root, text ='JRpeg Image Filename:')
 d_input_filename_input = Entry(root, textvariable = d_input_filename)
 
 JRpeg_decompress_button = Button(master=root, text='Decompress Image', command= lambda: JRpeg_decompress_and_metrics(d_input_filename.get(), c_input_filename.get()))

@@ -146,7 +146,7 @@ def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
 # Default params:
 #   -cbcr_downsize_rate=2, any higher will be noticeable, and greater than 5 will give diminishing reduction in file size
 #   -QL_rate=1, standard JPEG luminance quantisation todo: UPDATE THIS COMMENT WHEN SHITS FIXED LMAO
-def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img.bin", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
+def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
     # Read in original image as RGB three channel array and save a resized copy for display later
     logging.info("Loading original image file: {} ...".format(input_filename))
     original_img = cv2.imread(input_filename)
@@ -166,8 +166,8 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img.bin", cbcr
     logging.info("... YCbCr DCT and quantisation successful!")
 
     # Encode quantised dct YCbCr image with RLE grouping, and save to a binary file
-    logging.info("Attempting to encode and save JRpeg image as: {} ...".format(output_filename))
-    encoded_img = encode_and_save_quantised_dct_img(quantised_dct_img, QL_rate, QC_rate, output_filename)
+    logging.info("Attempting to encode and save JRpeg image as: {} ...".format(output_filename + ".jrpg"))
+    encoded_img = encode_and_save_quantised_dct_img(quantised_dct_img, QL_rate, QC_rate, output_filename + ".jrpg")
     logging.info("Encoded image in memory size: {} bytes!".format(getsizeof(encoded_img)))
     logging.info("... JRpeg image saved successfully!")
 
@@ -181,6 +181,6 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img.bin", cbcr
     logging.info("############################################################################")
     logging.info("############################################################################")
 
-    return [getsizeof(original_img), getsizeof(encoded_img), JRpeg_util.get_img_disk_size(input_filename), JRpeg_util.get_img_disk_size(output_filename)]
+    return [getsizeof(original_img), getsizeof(encoded_img), JRpeg_util.get_img_disk_size(input_filename), JRpeg_util.get_img_disk_size(output_filename+ ".jrpg")]
 
 # TODO: Add debug logging to methods
