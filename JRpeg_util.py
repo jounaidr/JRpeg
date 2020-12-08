@@ -21,6 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 
+import cv2
 import numpy as np
 
 Qlum=np.array([[16,11,10,16,24,40,51,61],
@@ -81,3 +82,11 @@ def get_img_disk_size(filename):
     # Get size of file on disk
     file = os.stat(filename)
     return file.st_size
+
+def meanSquareError(original_filename, compressed_filename):
+    imgA = cv2.imread(original_filename)
+    imgB = cv2.imread(compressed_filename)
+
+    mse = np.square(np.subtract(imgA, imgB)).mean()
+
+    return mse

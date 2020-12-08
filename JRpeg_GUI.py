@@ -26,6 +26,8 @@ from JRpeg_compress import JRpeg_compress
 from JRpeg_decompress import JRpeg_decompress
 
 JRpeg_metrics = [0,0,0,0]
+JRpeg_mse_val = 0
+
 
 def JRpeg_compress_and_metrics(input_filename, output_filename="JRpeg_encoded_img.bin", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
     global JRpeg_metrics
@@ -42,9 +44,18 @@ def JRpeg_compress_and_metrics(input_filename, output_filename="JRpeg_encoded_im
     JRpeg_disk_space.set(str(round(100 - (100 / (JRpeg_metrics[2] / JRpeg_metrics[3])), 3)) + "%")
 
 
+def JRpeg_decompress_and_metrics(compressed_filename, original_filename):
+    global JRpeg_mse_val
+    JRpeg_mse_val = JRpeg_decompress(compressed_filename, original_filename)
+
+    JRpeg_mse.set(str(round(JRpeg_mse_val, 3)))
+
+
 root = Tk()
 root.resizable(False, False)
 root.title('JRpeg and friends image compression =D')
+
+### JRpeg ###
 
 # Set default values
 c_input_filename = StringVar()
@@ -89,6 +100,9 @@ JRpeg_disk_ratio.set("N/A")
 JRpeg_disk_space = StringVar()
 JRpeg_disk_space.set("N/A")
 
+JRpeg_mse = StringVar()
+JRpeg_mse.set("N/A")
+
 # JRpeg compression widgets
 
 JRpeg_comp_label = Label(root, text="JRpeg Compression:", font='Helvetica 12 bold' )
@@ -126,6 +140,9 @@ JRpeg_inmem_ratio_input = Entry(root, textvariable = JRpeg_inmem_ratio)
 JRpeg_inmem_space_label = Label(root, text ='Space saved:')
 JRpeg_inmem_space_input = Entry(root, textvariable = JRpeg_inmem_space)
 
+JRpeg_mse_label = Label(root, text ='MSE:')
+JRpeg_mse_input = Entry(root, textvariable = JRpeg_mse)
+
 # JRpeg on disk metrics
 
 JRpeg_disk_metrics_label = Label(root, text="JRpeg On Disk Metrics:", font='Helvetica 12 bold')
@@ -149,24 +166,24 @@ JRpeg_decomp_label = Label(root, text="JRpeg Decompression:", font='Helvetica 12
 d_input_filename_label = Label(root, text ='Input Filename:')
 d_input_filename_input = Entry(root, textvariable = d_input_filename)
 
-JRpeg_decompress_button = Button(master=root, text='Decompress Image', command= lambda: JRpeg_decompress(d_input_filename.get()))
+JRpeg_decompress_button = Button(master=root, text='Decompress Image', command= lambda: JRpeg_decompress_and_metrics(d_input_filename.get(), c_input_filename.get()))
 
 
 # Widget mapping
 
 # JRpeg compression mappings
 JRpeg_comp_label.grid(row=0, column=0)
-c_input_filename_label.grid(row=0, column=1)
-c_input_filename_input.grid(row=0, column=2)
-output_filename_label.grid(row=0, column=3)
-output_filename_input.grid(row=0, column=4)
-cbcr_downsize_rate_label.grid(row=0, column=5)
-cbcr_downsize_rate_input.grid(row=0, column=6)
-QL_rate_label.grid(row=0, column=7)
-QL_rate_input.grid(row=0, column=8)
-QC_rate_label.grid(row=0, column=9)
+JRpeg_compress_button.grid(row=0, column=1)
+c_input_filename_label.grid(row=0, column=2)
+c_input_filename_input.grid(row=0, column=3)
+output_filename_label.grid(row=0, column=4)
+output_filename_input.grid(row=0, column=5)
+cbcr_downsize_rate_label.grid(row=0, column=6)
+cbcr_downsize_rate_input.grid(row=0, column=7)
+QL_rate_label.grid(row=0, column=8)
+QL_rate_input.grid(row=0, column=9)
+QC_rate_label.grid(row=0, column=10)
 QC_rate_input.grid(row=0, column=11)
-JRpeg_compress_button.grid(row=0, column=12)
 
 # JRpeg metrics mappings
 JRpeg_inmem_metrics_label.grid(row=1, column=0)
@@ -195,9 +212,12 @@ spacing.grid(row=3, column=0)
 
 # JRpeg decompression mappings
 JRpeg_decomp_label.grid(row=4, column=0)
-d_input_filename_label.grid(row=4, column=1)
-d_input_filename_input.grid(row=4, column=2)
-JRpeg_decompress_button.grid(row=4, column=3)
+JRpeg_decompress_button.grid(row=4, column=1)
+d_input_filename_label.grid(row=4, column=2)
+d_input_filename_input.grid(row=4, column=3)
+JRpeg_mse_label.grid(row=4, column=4)
+JRpeg_mse_input.grid(row=4, column=5)
+
 
 root.mainloop()
 

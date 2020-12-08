@@ -103,10 +103,12 @@ def inverse_dct_blocks(decoded_list):
 
                 if ch == 0:
                     #  If Y channel multiply by luminance_quantisation_matrix x luminance_quantisation_rate
-                    block = block * (JRpeg_util.Qlum * QL_rate)
+                    if QL_rate != 0:
+                        block = block * (JRpeg_util.Qlum * QL_rate)
                 else:
                     #  If Cb or Cr channels multiply by chrominance_quantisation_matrix x chrominance_quantisation_rate
-                    block = block * (JRpeg_util.Qchrom * QC_rate)
+                    if QC_rate != 0:
+                        block = block * (JRpeg_util.Qchrom * QC_rate)
 
                 # Inverse DCT the block using cv2.dct with DCT_INVERSE flag...
                 # ...More info: https://docs.opencv.org/2.4.3/modules/core/doc/operations_on_arrays.html?highlight=dct#cv.DCT
@@ -146,7 +148,7 @@ def YCbCr_to_rgb(YCbCr):
     return np.uint8(rgb_out)  # Return RGB image as unit8 (8 bit unsigned integer)
 
 
-def JRpeg_decompress(input_filename="JRpeg_encoded_img.bin"):
+def JRpeg_decompress(input_filename="JRpeg_encoded_img.bin", original_filename="JRpeg_encoded_img_bmp_copy.bmp"):
     # Load the JRpeg file into a YCbCr list, extract the metadata, and format each channel into 8x8 blocks
     logging.info("Loading and decoding JRpeg file: {} ...".format(input_filename))
     decoded_list_with_metadata = load_and_decode_quantised_dct_img(input_filename)
@@ -164,17 +166,20 @@ def JRpeg_decompress(input_filename="JRpeg_encoded_img.bin"):
 
     # Display decompressed JRpeg image and save a BMP version it
     logging.info("Attempting to display decompressed JRpeg image and save BMP copy ...")
-    cv2.imwrite(input_filename[:-4] + "_bmp_copy.bmp", rgb_output)
+    bmp_copy_filename = input_filename[:-4] + "_bmp_copy.bmp"
+    cv2.imwrite(bmp_copy_filename, rgb_output)
 
     rgb_output = cv2.resize(rgb_output, (1440, 1080))
     cv2.imshow('Decompressed JRpeg image: ' + input_filename, rgb_output)
     cv2.waitKey(0)
-    logging.info("... BMP copy saved as: {}".format(input_filename[:-4] + "_bmp_copy.bmp"))
+    logging.info("... BMP copy saved as: {}".format(bmp_copy_filename))
 
     logging.info("############################################################################")
     logging.info("############################################################################")
     logging.info("## THANK YOUR FOR USING JRpeg, brought to you by: github.com/jounaidr !!! ##")
     logging.info("############################################################################")
     logging.info("############################################################################")
+
+    return JRpeg_util.meanSquareError(original_filename, bmp_copy_filename)
 
 # TODO: Add debug logging to methods
