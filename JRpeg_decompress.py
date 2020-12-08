@@ -20,6 +20,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 import pickle
 
 import cv2
@@ -46,23 +47,29 @@ def load_and_decode_quantised_dct_img(filename):
     QL_rate = compressed_img[0].pop()
 
     # For each channel (Y, Cb, Cr)...
-    for i in range(3):
+    for ch in range(3):
         # ...Retrieve meta data for blocks height and width
-        block_width = compressed_img[i].pop()
-        block_height = compressed_img[i].pop()
+        block_width = compressed_img[ch].pop()
+        block_height = compressed_img[ch].pop()
         # Generate an empty array of 8x8 blocks, of size block_height x block_width
         out_blocks = np.zeros((block_height,block_width,8,8))
 
         # For each element in the current channel...
-        for j in range(len(compressed_img[i])):
-            # Unpack the tuple element into separate variables for its value and number of occurrence
-            num, value = compressed_img[i][j]
-            # Fill the corresponding channel of the output list with the raw values...
-            # ...For example: (5,0), (2,50), > [0,0,0,0,0,50,50]
-            decoded_list[i].extend(np.full(int(num), value))
+        for i in range(len(compressed_img[ch])):
+            if type(compressed_img[ch][i]) == list:
+                # Unpack the tuple element into separate variables for its value and number of occurrence
+                num, value = compressed_img[ch][i]
+                # Fill the corresponding channel of the output list with the raw values...
+                # ...For example: (5,0), (2,50), > [0,0,0,0,0,50,50]
+                decoded_list[ch].extend(np.full(int(num), value))
+                continue
+            else:
+                decoded_list[ch].append(compressed_img[ch][i])
+                continue
+
         # Split the current channel into list chunks of size 64 for each block
-        chunks = len(decoded_list[i]) / 64
-        decoded_list[i] = np.array_split(decoded_list[i], chunks)
+        chunks = len(decoded_list[ch]) / 64
+        decoded_list[ch] = np.array_split(decoded_list[ch], chunks)
 
         pos = 0
         # For each block
@@ -70,10 +77,10 @@ def load_and_decode_quantised_dct_img(filename):
             for y in range(0, block_width):
                 # Reformat the current block from a single 64 element list (defined by pos)...
                 # ...into the correct block format ("un-zigzag") and add the block to the out_blocks array (for the current channel)
-                out_blocks[x,y] = JRpeg_util.un_zigzag_block(decoded_list[i][pos])
+                out_blocks[x,y] = JRpeg_util.un_zigzag_block(decoded_list[ch][pos])
                 pos = pos + 1
         # Replace the current channel list with the reformatted 8x8 blocks array
-        decoded_list[i] = out_blocks
+        decoded_list[ch] = out_blocks
 
     return [decoded_list, QL_rate, QC_rate]  # Return the decoded list, QL_rate, QC_rate
 
@@ -139,10 +146,10 @@ def YCbCr_to_rgb(YCbCr):
     return np.uint8(rgb_out)  # Return RGB image as unit8 (8 bit unsigned integer)
 
 
-def JRpeg_decompress(input_filename="encoded_img"):
+def JRpeg_decompress(input_filename="JRpeg_encoded_img.bin"):
     # Load the JRpeg file into a YCbCr list, extract the metadata, and format each channel into 8x8 blocks
-    logging.info("Loading and decoding JRpeg file: {}.bin ...".format(input_filename))
-    decoded_list_with_metadata = load_and_decode_quantised_dct_img(input_filename + ".bin")
+    logging.info("Loading and decoding JRpeg file: {} ...".format(input_filename))
+    decoded_list_with_metadata = load_and_decode_quantised_dct_img(input_filename)
     logging.info("... YCbCr loaded and decoded successfully!")
 
     # Inverse dct/quantise the YCbCr image
@@ -157,12 +164,12 @@ def JRpeg_decompress(input_filename="encoded_img"):
 
     # Display decompressed JRpeg image and save a BMP version it
     logging.info("Attempting to display decompressed JRpeg image and save BMP copy ...")
-    cv2.imwrite(input_filename + "_bmp_copy.bmp", rgb_output)
+    cv2.imwrite(input_filename[:-4] + "_bmp_copy.bmp", rgb_output)
 
     rgb_output = cv2.resize(rgb_output, (1440, 1080))
-    cv2.imshow('Decompressed JRpeg image: ' + input_filename + ".bin", rgb_output)
+    cv2.imshow('Decompressed JRpeg image: ' + input_filename, rgb_output)
     cv2.waitKey(0)
-    logging.info("... BMP copy saved as: {}".format(input_filename + "_bmp_copy.bmp"))
+    logging.info("... BMP copy saved as: {}".format(input_filename[:-4] + "_bmp_copy.bmp"))
 
     logging.info("############################################################################")
     logging.info("############################################################################")
@@ -170,7 +177,4 @@ def JRpeg_decompress(input_filename="encoded_img"):
     logging.info("############################################################################")
     logging.info("############################################################################")
 
-
-
-# JRpeg_decompress()
 # TODO: Add debug logging to methods

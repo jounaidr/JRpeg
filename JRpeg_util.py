@@ -19,7 +19,7 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+import os
 
 import numpy as np
 
@@ -76,3 +76,8 @@ def un_zigzag_block(block_list):
             block[i,j] = block_list[zigzag_idx[i][j]]
 
     return block  # Return the formatted 8x8 block
+
+def get_img_disk_size(filename):
+    # Get size of file on disk
+    file = os.stat(filename)
+    return file.st_size

@@ -20,6 +20,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 import pickle
 from itertools import groupby
 from sys import getsizeof
@@ -89,11 +90,11 @@ def dtc_and_quantise_img(img, QL_rate, QC_rate):
 
                 if ch == 0:
                     #  If Y channel divide by luminance_quantisation_matrix x luminance_quantisation_rate (if not 0)
-                    if QL_rate <= 0:
+                    if QL_rate >= 0:
                         block = np.trunc(block / (JRpeg_util.Qlum * QL_rate))
                 else:
                     #  If Cb or Cr channels divide by chrominance_quantisation_matrix x chrominance_quantisation_rate (if not 0)
-                    if QC_rate <= 0:
+                    if QC_rate >= 0:
                         block = np.trunc(block / (JRpeg_util.Qchrom * QC_rate))
                 # Set adjusted block in image
                 img[ch][i, j] = block
@@ -122,6 +123,15 @@ def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
         encoded_list[ch] = list(map(int, encoded_list[ch]))
         # RLE style grouping of elements, will create tuples of (amount, value), for example [0,0,0,0] -> (4, 0)
         encoded_list[ch] = [[len(list(group)), key] for key, group in groupby(encoded_list[ch])]
+
+        # TODO: following can be optimised...
+        for x in range(len(encoded_list[ch])):
+            # Unpack the tuple element into separate variables for its value and number of occurrence
+            num, value = encoded_list[ch][x]
+            # If the occurrence of a value is just 1, just store its value instead of a tuple (half the size)
+            if num == 1:
+                encoded_list[ch][x] = value
+
         # Append channel with meta data for block height and block width, QLrate and QCrate
         encoded_list[ch].extend([ block_height, block_width])
     # Append luminance channel with meta data for block QLrate and QCrate
@@ -136,7 +146,7 @@ def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
 # Default params:
 #   -cbcr_downsize_rate=2, any higher will be noticeable, and greater than 5 will give diminishing reduction in file size
 #   -QL_rate=1, standard JPEG luminance quantisation todo: UPDATE THIS COMMENT WHEN SHITS FIXED LMAO
-def JRpeg_compress(input_filename, output_filename="encoded_img", cbcr_downsize_rate=2, QL_rate=16, QC_rate=1):
+def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img.bin", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
     # Read in original image as RGB three channel array and save a resized copy for display later
     logging.info("Loading original image file: {} ...".format(input_filename))
     original_img = cv2.imread(input_filename)
@@ -156,8 +166,8 @@ def JRpeg_compress(input_filename, output_filename="encoded_img", cbcr_downsize_
     logging.info("... YCbCr DCT and quantisation successful!")
 
     # Encode quantised dct YCbCr image with RLE grouping, and save to a binary file
-    logging.info("Attempting to encode and save JRpeg image as: {} ...".format(output_filename + ".bin"))
-    encoded_img = encode_and_save_quantised_dct_img(quantised_dct_img, QL_rate, QC_rate, (output_filename + ".bin"))
+    logging.info("Attempting to encode and save JRpeg image as: {} ...".format(output_filename))
+    encoded_img = encode_and_save_quantised_dct_img(quantised_dct_img, QL_rate, QC_rate, output_filename)
     logging.info("Encoded image in memory size: {} bytes!".format(getsizeof(encoded_img)))
     logging.info("... JRpeg image saved successfully!")
 
@@ -171,7 +181,6 @@ def JRpeg_compress(input_filename, output_filename="encoded_img", cbcr_downsize_
     logging.info("############################################################################")
     logging.info("############################################################################")
 
+    return [getsizeof(original_img), getsizeof(encoded_img), JRpeg_util.get_img_disk_size(input_filename), JRpeg_util.get_img_disk_size(output_filename)]
 
-
-# JRpeg_compress("bmp-img/IC1.bmp")
 # TODO: Add debug logging to methods
