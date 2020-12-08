@@ -43,8 +43,8 @@ def rgb_to_ycbcr(img):
 
     # YCbCr conversion: https://www.mir.com/DMG/ycbcr.html
     img[:, :, 0] = 0.299 * r + 0.587 * g + 0.114 * b  # Y
-    img[:, :, 1] = (-0.1687 * r - 0.3313 * g + 0.5 * b) + 128  # Cb
-    img[:, :, 2] = (0.5 * r - 0.4187 * g - 0.0813 * b) + 128  # Cr
+    img[:, :, 1] = (-0.168736 * r - 0.331264 * g + 0.5 * b) + 128  # Cb
+    img[:, :, 2] = (0.5 * r - 0.418688 * g - 0.081312 * b) + 128  # Cr
 
     return np.uint8(img)  # Return image with Y,Cb,Cr in place of R,G,B channels, as an 8 bit unsigned integer
 

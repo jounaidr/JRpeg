@@ -140,7 +140,7 @@ def YCbCr_to_rgb(YCbCr):
 
     # Convert YCbCr to RGB, more info: https://www.mir.com/DMG/ycbcr.html
     rgb_out[:, :, 0] = y + 1.402 * cr
-    rgb_out[:, :, 1] = y - 0.34414 * cb - 0.71414 * cr
+    rgb_out[:, :, 1] = y - 0.344136 * cb - 0.714136 * cr
     rgb_out[:, :, 2] = y + 1.772 * cb
     # Ensure pixels are in 0 to 255 range
     np.putmask(rgb_out, rgb_out > 255, 255)
