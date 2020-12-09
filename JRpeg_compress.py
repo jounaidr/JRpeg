@@ -64,7 +64,7 @@ def down_sample_cbcr(YCbCr, sample_factor):
     return [np.float32(YCbCr[:, :, 0]), np.float32(YCbCr[:, :, 1]), np.float32(YCbCr[:, :, 2])]  # If not downsampling selected just return Y, Cb and Cr in list format
 
 
-def dtc_and_quantise_img(img, QL_rate, QC_rate):
+def dct_and_quantise_img(img, QL_rate, QC_rate):
     # For each channel (Y,Cb and Cr)
     for ch in range(3):
 
