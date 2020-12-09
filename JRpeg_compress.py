@@ -23,7 +23,7 @@
 
 import pickle
 from itertools import groupby
-from sys import getsizeof
+from objsize import get_deep_size
 
 import cv2
 import numpy as np
@@ -46,7 +46,7 @@ def rgb_to_ycbcr(img):
     img[:, :, 1] = (-0.168736 * r - 0.331264 * g + 0.5 * b) + 128  # Cb
     img[:, :, 2] = (0.5 * r - 0.418688 * g - 0.081312 * b) + 128  # Cr
 
-    return np.uint8(img)  # Return image with Y,Cb,Cr in place of R,G,B channels, as an 8 bit unsigned integer
+    return img  # Return image with Y,Cb,Cr in place of R,G,B channels, as an 8 bit unsigned integer
 
 
 def down_sample_cbcr(YCbCr, sample_factor):
@@ -90,16 +90,16 @@ def dtc_and_quantise_img(img, QL_rate, QC_rate):
 
                 if ch == 0:
                     #  If Y channel divide by luminance_quantisation_matrix x luminance_quantisation_rate (if not 0)
-                    if QL_rate != 0:
+                    if QL_rate > 0:
                         block = np.trunc(block / (JRpeg_util.Qlum * QL_rate))
                 else:
                     #  If Cb or Cr channels divide by chrominance_quantisation_matrix x chrominance_quantisation_rate (if not 0)
-                    if QC_rate != 0:
+                    if QC_rate > 0:
                         block = np.trunc(block / (JRpeg_util.Qchrom * QC_rate))
                 # Set adjusted block in image
                 img[ch][i, j] = block
 
-    return img #  Return split, dct and quantised image
+    return img #  Return split (by 8x8 blocks), dct and quantised image
 
 
 def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
@@ -150,8 +150,11 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_dow
     # Read in original image as RGB three channel array and save a resized copy for display later
     logging.info("Loading original image file: {} ...".format(input_filename))
     original_img = cv2.imread(input_filename)
-    logging.info("Original image in memory size: {} bytes!".format(getsizeof(original_img)))
+    logging.info("Original image in memory size: {} bytes!".format(get_deep_size(original_img)))
     resized_original_img = cv2.resize(original_img, (1440, 1080))
+    # Display original input image resized
+    cv2.imshow('Original Image: ' + input_filename, resized_original_img)
+    cv2.waitKey(0)
     logging.info("... image loaded successfully!")
 
     # Convert image to YCbCr and downsample Cb and Cr channels
@@ -168,12 +171,8 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_dow
     # Encode quantised dct YCbCr image with RLE grouping, and save to a binary file
     logging.info("Attempting to encode and save JRpeg image as: {} ...".format(output_filename + ".jrpg"))
     encoded_img = encode_and_save_quantised_dct_img(quantised_dct_img, QL_rate, QC_rate, output_filename + ".jrpg")
-    logging.info("Encoded image in memory size: {} bytes!".format(getsizeof(encoded_img)))
+    logging.info("Encoded image in memory size: {} bytes!".format(get_deep_size(encoded_img)))
     logging.info("... JRpeg image saved successfully!")
-
-    # Display original input image
-    cv2.imshow('Original Image: ' + input_filename, resized_original_img)
-    cv2.waitKey(0)
 
     logging.info("############################################################################")
     logging.info("############################################################################")
@@ -181,6 +180,6 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_dow
     logging.info("############################################################################")
     logging.info("############################################################################")
 
-    return [getsizeof(original_img), getsizeof(encoded_img), JRpeg_util.get_img_disk_size(input_filename), JRpeg_util.get_img_disk_size(output_filename+ ".jrpg")]
+    return [get_deep_size(original_img), get_deep_size(encoded_img), JRpeg_util.get_img_disk_size(input_filename), JRpeg_util.get_img_disk_size(output_filename+ ".jrpg")]
 
 # TODO: Add debug logging to methods

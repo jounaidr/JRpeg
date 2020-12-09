@@ -31,7 +31,7 @@ JRpeg_mse_val = 0
 
 def JRpeg_compress_and_metrics(input_filename, output_filename="JRpeg_encoded_img.jrpg", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
     global JRpeg_metrics
-    JRpeg_metrics = JRpeg_compress(input_filename, output_filename, cbcr_downsize_rate, QL_rate, QC_rate)
+    JRpeg_metrics = JRpeg_compress(input_filename, output_filename, int(cbcr_downsize_rate), float(QL_rate), float(QC_rate))
 
     JRpeg_original_inmem_size.set(str(JRpeg_metrics[0]) + " bytes")
     JRpeg_comp_inmem_size.set(str(JRpeg_metrics[1]) + " bytes")
@@ -67,14 +67,14 @@ d_input_filename.set("JRpeg_encoded_img")
 output_filename = StringVar()
 output_filename.set("JRpeg_encoded_img")
 
-cbcr_downsize_rate = IntVar()
-cbcr_downsize_rate.set(2)
+cbcr_downsize_rate = StringVar()
+cbcr_downsize_rate.set("2")
 
-QL_rate = IntVar()
-QL_rate.set(1)
+QL_rate = StringVar()
+QL_rate.set("1")
 
-QC_rate = IntVar()
-QC_rate.set(1)
+QC_rate = StringVar()
+QC_rate.set("1")
 
 JRpeg_original_inmem_size = StringVar()
 JRpeg_original_inmem_size.set(str(JRpeg_metrics[0]) + " bytes")
@@ -122,7 +122,7 @@ QL_rate_input = Entry(root, justify='left', textvariable = QL_rate)
 QC_rate_label = Label(root, text = 'QC_rate:')
 QC_rate_input = Entry(root, justify='left', textvariable = QC_rate)
 
-JRpeg_compress_button = Button(master=root, text='Compress Image', command= lambda: JRpeg_compress_and_metrics(c_input_filename.get(), output_filename.get(), int(cbcr_downsize_rate.get()), int(QL_rate.get()), int(QC_rate.get())))
+JRpeg_compress_button = Button(master=root, text='Compress Image', command= lambda: JRpeg_compress_and_metrics(c_input_filename.get(), output_filename.get(), cbcr_downsize_rate.get(), QL_rate.get(), QC_rate.get()))
 
 # JRpeg in mem metrics widgets
 
