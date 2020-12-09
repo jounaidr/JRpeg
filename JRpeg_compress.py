@@ -165,7 +165,7 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_dow
 
     # Convert YCbCr image into 8x8 blocks and calculate dct on each block, then quantise each block
     logging.info("Attempting to DCT and quantise YCbCr with QLuminance_rate: {}, and QChrominance_rate {} ...".format(QL_rate,QC_rate))
-    quantised_dct_img = dtc_and_quantise_img(YCbCr_downsampled, QL_rate, QC_rate)
+    quantised_dct_img = dct_and_quantise_img(YCbCr_downsampled, QL_rate, QC_rate)
     logging.info("... YCbCr DCT and quantisation successful!")
 
     # Encode quantised dct YCbCr image with RLE grouping, and save to a binary file
