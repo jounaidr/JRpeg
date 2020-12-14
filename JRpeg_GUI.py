@@ -59,7 +59,7 @@ root.title('JRpeg and friends image compression =D')
 
 # Set default values
 c_input_filename = StringVar()
-c_input_filename.set("bmp-img/IC1.bmp")
+c_input_filename.set("img-bmp/IC1.bmp")
 
 d_input_filename = StringVar()
 d_input_filename.set("JRpeg_encoded_img")
