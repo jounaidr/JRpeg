@@ -17,8 +17,8 @@ and memory/disk size as well as mean squared error metrics are displayed.
 
 Version 1.0 executable is available [here](https://drive.google.com/file/d/1tADfOqESTIk-7R1X5Kpk-qmboAdcY8Tw/view?usp=sharing)
 
-Upon running the executable, the following will be displayed:
-[/docs/resources/GUI.png]
+Upon running the executable, the following will be displayed:\
+![GUI png](https://github.com/jounaidr/JRpeg/blob/main/docs/resources/GUI.PNG)
 
 ---
 
