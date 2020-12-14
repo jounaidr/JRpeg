@@ -126,8 +126,6 @@ JRpeg_compress_button = Button(master=root, text='Compress Image', command= lamb
 
 # JRpeg in mem metrics widgets
 
-JRpeg_inmem_metrics_label = Label(root, text="JRpeg In Memory Metrics:", font='Helvetica 12 bold')
-
 JRpeg_orig_inmem_size_label = Label(root, text ='Original In Mem Size:')
 JRpeg_orig_inmem_size_input = Entry(root, textvariable = JRpeg_original_inmem_size)
 
@@ -144,8 +142,6 @@ JRpeg_mse_label = Label(root, text ='Mean Squared Error:')
 JRpeg_mse_input = Entry(root, textvariable = JRpeg_mse)
 
 # JRpeg on disk metrics
-
-JRpeg_disk_metrics_label = Label(root, text="JRpeg On Disk Metrics:", font='Helvetica 12 bold')
 
 JRpeg_orig_disk_size_label = Label(root, text ='Original On Disk Size:')
 JRpeg_orig_disk_size_input = Entry(root, textvariable = JRpeg_original_disk_size)
@@ -186,25 +182,25 @@ QC_rate_label.grid(row=0, column=10)
 QC_rate_input.grid(row=0, column=11)
 
 # JRpeg metrics mappings
-JRpeg_inmem_metrics_label.grid(row=1, column=0)
-JRpeg_orig_inmem_size_label.grid(row=1, column=1)
-JRpeg_orig_inmem_size_input.grid(row=1, column=2)
-JRpeg_comp_inmem_size_label.grid(row=1, column=3)
-JRpeg_comp_inmem_size_input.grid(row=1, column=4)
-JRpeg_inmem_ratio_label.grid(row=1, column=5)
-JRpeg_inmem_ratio_input.grid(row=1, column=6)
-JRpeg_inmem_space_label.grid(row=1, column=7)
-JRpeg_inmem_space_input.grid(row=1, column=8)
 
-JRpeg_disk_metrics_label.grid(row=2, column=0)
-JRpeg_orig_disk_size_label.grid(row=2, column=1)
-JRpeg_orig_disk_size_input.grid(row=2, column=2)
-JRpeg_comp_disk_size_label.grid(row=2, column=3)
-JRpeg_comp_disk_size_input.grid(row=2, column=4)
-JRpeg_disk_ratio_label.grid(row=2, column=5)
-JRpeg_disk_ratio_input.grid(row=2, column=6)
-JRpeg_disk_space_label.grid(row=2, column=7)
-JRpeg_disk_space_input.grid(row=2, column=8)
+JRpeg_orig_inmem_size_label.grid(row=1, column=4)
+JRpeg_orig_inmem_size_input.grid(row=1, column=5)
+JRpeg_comp_inmem_size_label.grid(row=1, column=6)
+JRpeg_comp_inmem_size_input.grid(row=1, column=7)
+JRpeg_inmem_ratio_label.grid(row=1, column=8)
+JRpeg_inmem_ratio_input.grid(row=1, column=9)
+JRpeg_inmem_space_label.grid(row=1, column=10)
+JRpeg_inmem_space_input.grid(row=1, column=11)
+
+
+JRpeg_orig_disk_size_label.grid(row=2, column=4)
+JRpeg_orig_disk_size_input.grid(row=2, column=5)
+JRpeg_comp_disk_size_label.grid(row=2, column=6)
+JRpeg_comp_disk_size_input.grid(row=2, column=7)
+JRpeg_disk_ratio_label.grid(row=2, column=8)
+JRpeg_disk_ratio_input.grid(row=2, column=9)
+JRpeg_disk_space_label.grid(row=2, column=10)
+JRpeg_disk_space_input.grid(row=2, column=11)
 
 # Spacing
 spacing = Label(root, text="", font='Helvetica 12 bold')
