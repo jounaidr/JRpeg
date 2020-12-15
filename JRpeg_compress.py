@@ -144,8 +144,9 @@ def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
 
 
 # Default params:
-#   -cbcr_downsize_rate=2, any higher will be noticeable, and greater than 5 will give diminishing reduction in file size
-#   -QL_rate=1, standard JPEG luminance quantisation todo: UPDATE THIS COMMENT WHEN SHITS FIXED LMAO
+#   -cbcr_downsize_rate=2, any higher becomes slightly noticeable, and greater than 5 will give diminishing reduction in file size
+#   -QL_rate=1, standard JPEG luminance quantisation, increasing greatly improves compression rate but also has a big effect of image quality
+#   -QC_rate=1, standard JPEG chrominance quantisation, increasing has a small effect of compression rate but is only noticeable on images with vibrant color spots
 def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
     # Read in original image as RGB three channel array and save a resized copy for display later
     logging.info("Loading original image file: {} ...".format(input_filename))
@@ -182,4 +183,4 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_dow
 
     return [get_deep_size(original_img), get_deep_size(encoded_img), JRpeg_util.get_img_disk_size(input_filename), JRpeg_util.get_img_disk_size(output_filename+ ".jrpg")]
 
-# TODO: Add debug logging to methods
+# TODO: Add debug logging to methods, optimise iterables, add time metrics

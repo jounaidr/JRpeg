@@ -183,4 +183,4 @@ def JRpeg_decompress(input_filename="JRpeg_encoded_img", original_filename="JRpe
 
     return JRpeg_util.meanSquareError(original_filename, bmp_copy_filename)
 
-# TODO: Add debug logging to methods
+# TODO: Add debug logging to methods, optimise iterables, add time metrics
