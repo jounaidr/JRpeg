@@ -12,7 +12,7 @@ Full documentation is available [here.](https://github.com/jounaidr/JRpeg/blob/m
 
 ---
 
-## Instructions
+### Instructions
 
 Version 1.0 executable is available [here](https://drive.google.com/file/d/1tADfOqESTIk-7R1X5Kpk-qmboAdcY8Tw/view?usp=sharing)
 
@@ -31,7 +31,7 @@ parameter is then calculated and displayed.
 
 ---
 
-## Build
+### Build
 
 To make changes and rebuild the GUI, do the following:
 
@@ -41,7 +41,7 @@ To make changes and rebuild the GUI, do the following:
 
 ---
 
-## Parameters And Metrics
+### Parameters And Metrics
 
 The following parameters can be adjusted:
 
@@ -65,7 +65,7 @@ The following metrics can be retrieved from the GUI:
 
 ---
 
-## License
+### License
 
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
 
