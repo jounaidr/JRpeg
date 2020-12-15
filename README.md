@@ -1,16 +1,14 @@
 # JRpeg
 
-JRpeg is an image compression codec based on the methodologies outlined in JPEG. Implementation
-is in python with a GUI application runnable as an executable, for which compression parameters can be adjusted,
-and memory/disk compression rate as well as mean squared error metrics are displayed.
-Full documentation is available [here.](https://github.com/jounaidr/JRpeg/blob/main/docs/JRpeg_docs.pdf) 
-
----
-
 * [Instructions](#instructions)
 * [build](#build)
 * [Parameters and Metrics](#parameters-and-metrics)
 * [License](#license)
+
+JRpeg is an image compression codec based on the methodologies outlined in JPEG. Implementation
+is in python with a GUI application runnable as an executable, for which compression parameters can be adjusted,
+and memory/disk compression rate as well as mean squared error metrics are displayed.
+Full documentation is available [here.](https://github.com/jounaidr/JRpeg/blob/main/docs/JRpeg_docs.pdf) 
 
 ---
 
