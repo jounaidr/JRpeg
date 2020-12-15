@@ -14,7 +14,7 @@ Full documentation is available [here.](https://github.com/jounaidr/JRpeg/blob/m
 
 ### Instructions
 
-Version 1.0 executable is available [here](https://drive.google.com/file/d/1tADfOqESTIk-7R1X5Kpk-qmboAdcY8Tw/view?usp=sharing)
+Version 1.0 executable is available [here](https://github.com/jounaidr/JRpeg/releases/tag/1.0)
 
 Upon running the executable, the following will be displayed:\
 ![GUI png](https://github.com/jounaidr/JRpeg/blob/main/docs/resources/GUI.PNG)
