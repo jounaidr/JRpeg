@@ -22,7 +22,7 @@
 
 
 from tkinter import *
-from JRpeg_compress import JRpeg_compress
+from compress import compress
 from JRpeg_decompress import JRpeg_decompress
 
 JRpeg_metrics = [0,0,0,0]
@@ -31,7 +31,7 @@ JRpeg_mse_val = 0
 
 def JRpeg_compress_and_metrics(input_filename, output_filename="JRpeg_encoded_img.jrpg", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
     global JRpeg_metrics
-    JRpeg_metrics = JRpeg_compress(input_filename, output_filename, int(cbcr_downsize_rate), float(QL_rate), float(QC_rate))
+    JRpeg_metrics = compress(input_filename, output_filename, int(cbcr_downsize_rate), float(QL_rate), float(QC_rate))
 
     JRpeg_original_inmem_size.set(str(JRpeg_metrics[0]) + " bytes")
     JRpeg_comp_inmem_size.set(str(JRpeg_metrics[1]) + " bytes")

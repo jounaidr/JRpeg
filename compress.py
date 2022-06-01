@@ -24,6 +24,7 @@
 import pickle
 from itertools import groupby
 from objsize import get_deep_size
+from optparse import OptionParser
 
 import cv2
 import numpy as np
@@ -32,10 +33,11 @@ import skimage.util
 import JRpeg_util
 
 import logging
+
 logging.basicConfig(
-                    format='%(asctime)s %(levelname)-8s %(message)s',
-                    level=logging.INFO,
-                    datefmt='%Y-%m-%d %H:%M:%S')
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 def rgb_to_ycbcr(img):
@@ -59,9 +61,11 @@ def down_sample_cbcr(YCbCr, sample_factor):
         cb_down = cb_box[::sample_factor, ::sample_factor]
         cr_down = cr_box[::sample_factor, ::sample_factor]
 
-        return [np.float32(YCbCr[:, :, 0]), np.float32(cb_down), np.float32(cr_down)]  # Return list containing Y with downsampled Cb and Cr components as float
+        return [np.float32(YCbCr[:, :, 0]), np.float32(cb_down),
+                np.float32(cr_down)]  # Return list containing Y with downsampled Cb and Cr components as float
 
-    return [np.float32(YCbCr[:, :, 0]), np.float32(YCbCr[:, :, 1]), np.float32(YCbCr[:, :, 2])]  # If not downsampling selected just return Y, Cb and Cr in list format
+    return [np.float32(YCbCr[:, :, 0]), np.float32(YCbCr[:, :, 1]),
+            np.float32(YCbCr[:, :, 2])]  # If not downsampling selected just return Y, Cb and Cr in list format
 
 
 def dct_and_quantise_img(img, QL_rate, QC_rate):
@@ -72,7 +76,7 @@ def dct_and_quantise_img(img, QL_rate, QC_rate):
         height, width = img[ch].shape[:2]
         if ((height % 8) > 0) or ((width % 8) > 0):
             # Adjust height and width so they are a multiple of 8
-            img[ch] = img[ch][:len(img[ch]) -(height % 8), :len(img[ch][0]) -(width % 8)]
+            img[ch] = img[ch][:len(img[ch]) - (height % 8), :len(img[ch][0]) - (width % 8)]
 
         # Split component into array of 8x8 blocks
         img[ch] = skimage.util.view_as_blocks(img[ch], block_shape=(8, 8))
@@ -99,7 +103,7 @@ def dct_and_quantise_img(img, QL_rate, QC_rate):
                 # Set adjusted block in image
                 img[ch][i, j] = block
 
-    return img #  Return split (by 8x8 blocks), dct and quantised image
+    return img  # Return split (by 8x8 blocks), dct and quantised image
 
 
 def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
@@ -133,7 +137,7 @@ def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
                 encoded_list[ch][x] = value
 
         # Append channel with meta data for block height and block width, QLrate and QCrate
-        encoded_list[ch].extend([ block_height, block_width])
+        encoded_list[ch].extend([block_height, block_width])
     # Append luminance channel with meta data for block QLrate and QCrate
     encoded_list[0].extend([QL_rate, QC_rate])
 
@@ -147,7 +151,7 @@ def encode_and_save_quantised_dct_img(img_blocks, QL_rate, QC_rate, filename):
 #   -cbcr_downsize_rate=2, any higher becomes slightly noticeable, and greater than 5 will give diminishing reduction in file size
 #   -QL_rate=1, standard JPEG luminance quantisation, increasing greatly improves compression rate but also has a big effect of image quality
 #   -QC_rate=1, standard JPEG chrominance quantisation, increasing has a small effect of compression rate but is only noticeable on images with vibrant color spots
-def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
+def compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_downsize_rate=2, QL_rate=1, QC_rate=1):
     # Read in original image as RGB three channel array and save a resized copy for display later
     logging.info("Loading original image file: {} ...".format(input_filename))
     original_img = cv2.imread(input_filename)
@@ -159,13 +163,16 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_dow
     logging.info("... image loaded successfully!")
 
     # Convert image to YCbCr and downsample Cb and Cr channels
-    logging.info("Converting RGB image to YCbCr image, with Cb and Cr downsampled by a factor of: {} ...".format(cbcr_downsize_rate))
+    logging.info("Converting RGB image to YCbCr image, with Cb and Cr downsampled by a factor of: {} ...".format(
+        cbcr_downsize_rate))
     YCbCr = rgb_to_ycbcr(original_img)
     YCbCr_downsampled = down_sample_cbcr(YCbCr, cbcr_downsize_rate)
     logging.info("... YCbCr conversion and downsampling successful!")
 
     # Convert YCbCr image into 8x8 blocks and calculate dct on each block, then quantise each block
-    logging.info("Attempting to DCT and quantise YCbCr with QLuminance_rate: {}, and QChrominance_rate {} ...".format(QL_rate,QC_rate))
+    logging.info(
+        "Attempting to DCT and quantise YCbCr with QLuminance_rate: {}, and QChrominance_rate {} ...".format(QL_rate,
+                                                                                                             QC_rate))
     quantised_dct_img = dct_and_quantise_img(YCbCr_downsampled, QL_rate, QC_rate)
     logging.info("... YCbCr DCT and quantisation successful!")
 
@@ -181,6 +188,24 @@ def JRpeg_compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_dow
     logging.info("############################################################################")
     logging.info("############################################################################")
 
-    return [get_deep_size(original_img), get_deep_size(encoded_img), JRpeg_util.get_img_disk_size(input_filename), JRpeg_util.get_img_disk_size(output_filename+ ".jrpg")]
+    return [get_deep_size(original_img), get_deep_size(encoded_img), JRpeg_util.get_img_disk_size(input_filename),
+            JRpeg_util.get_img_disk_size(output_filename + ".jrpg")]
+
+
+def main():
+    op = OptionParser(usage='python compress.py [options]')
+    op.add_option('-i', '--input_file', help='full directory path of input image (required)', required=True)
+    op.add_option('-o', '--output_filename', help='filename of output image'
+                                                  ' [default: %default]', default='JRpeg_encoded_img')
+    op.add_option('-d', '--cbcr_downsize_rate', help='cbcr downsize rate'
+                                                     ' [default: %default]', default='JRpeg_encoded_img')
+    op.add_option('-l', '--output_filename', help='filename of output image'
+                                                  ' [default: %default]', default='JRpeg_encoded_img')
+    op.add_option('-c', '--output_filename', help='filename of output image'
+                                                  ' [default: %default]', default='JRpeg_encoded_img')
+
+
+if __name__ == "__main__":
+    main()
 
 # TODO: Add debug logging to methods, optimise iterables, add time metrics
