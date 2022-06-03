@@ -22,6 +22,7 @@
 
 
 import pickle
+import sys
 from itertools import groupby
 from objsize import get_deep_size
 from optparse import OptionParser
@@ -182,27 +183,48 @@ def compress(input_filename, output_filename="JRpeg_encoded_img", cbcr_downsize_
     logging.info("Encoded image in memory size: {} bytes!".format(get_deep_size(encoded_img)))
     logging.info("... JRpeg image saved successfully!")
 
-    logging.info("############################################################################")
-    logging.info("############################################################################")
-    logging.info("## THANK YOUR FOR USING JRpeg, brought to you by: github.com/jounaidr !!! ##")
-    logging.info("############################################################################")
-    logging.info("############################################################################")
-
     return [get_deep_size(original_img), get_deep_size(encoded_img), JRpeg_util.get_img_disk_size(input_filename),
             JRpeg_util.get_img_disk_size(output_filename + ".jrpg")]
 
 
 def main():
     op = OptionParser(usage='python compress.py [options]')
-    op.add_option('-i', '--input_file', help='full directory path of input image (required)', required=True)
+    op.add_option('-i', '--input_file', help='full directory path of input image (required)')
     op.add_option('-o', '--output_filename', help='filename of output image'
                                                   ' [default: %default]', default='JRpeg_encoded_img')
     op.add_option('-d', '--cbcr_downsize_rate', help='cbcr downsize rate'
-                                                     ' [default: %default]', default='JRpeg_encoded_img')
-    op.add_option('-l', '--output_filename', help='filename of output image'
-                                                  ' [default: %default]', default='JRpeg_encoded_img')
-    op.add_option('-c', '--output_filename', help='filename of output image'
-                                                  ' [default: %default]', default='JRpeg_encoded_img')
+                                                     ' [default: %default]', default='2')
+    op.add_option('-l', '--ql_rate', help='luminance quantisation rate'
+                                          ' [default: %default]', default='1')
+    op.add_option('-c', '--qc_rate', help='chrominance quantisation rate'
+                                          ' [default: %default]', default='1')
+
+    (options, unused_args) = op.parse_args()
+
+    if options.input_file is None:
+        logging.error("Option -i/--input_file required, please enter valid file path")
+        sys.exit(0)
+
+    metrics = compress(options.input_file,
+                       options.output_filename,
+                       int(options.cbcr_downsize_rate),
+                       float(options.ql_rate),
+                       float(options.qc_rate))
+
+    print("----------------------------------------------------------------------")
+    logging.info("IN MEMORY METRICS")
+    print("----------------------------------------------------------------------")
+    logging.info("Original In Memory Size: {} bytes".format(str(metrics[0])))
+    logging.info("Compressed In Memory Size: {} bytes".format(str(metrics[1])))
+    logging.info("In Memory Compression Ratio: {}".format(str(round((metrics[0] / metrics[1]), 2))))
+    logging.info("In Memory Space Saved: {} %".format(str((round(100 - (100 / metrics[0] / metrics[1])), 3))))
+    print("----------------------------------------------------------------------")
+    logging.info("ON DISK METRICS")
+    print("----------------------------------------------------------------------")
+    logging.info("Original On Disk Size: {} bytes".format(str(metrics[2])))
+    logging.info("Compressed On Disk Size: {} bytes".format(str(metrics[3])))
+    logging.info("On Disk Compression Ratio: {}".format(str(round((metrics[2] / metrics[3]), 2))))
+    logging.info("On Disk Space Saved: {} %".format(str((round(100 - (100 / metrics[2] / metrics[3])), 3))))
 
 
 if __name__ == "__main__":

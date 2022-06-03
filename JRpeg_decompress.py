@@ -175,12 +175,6 @@ def JRpeg_decompress(input_filename="JRpeg_encoded_img", original_filename="JRpe
     cv2.waitKey(0)
     logging.info("... BMP copy saved as: {}".format(bmp_copy_filename))
 
-    logging.info("############################################################################")
-    logging.info("############################################################################")
-    logging.info("## THANK YOUR FOR USING JRpeg, brought to you by: github.com/jounaidr !!! ##")
-    logging.info("############################################################################")
-    logging.info("############################################################################")
-
     return JRpeg_util.meanSquareError(original_filename, bmp_copy_filename)
 
 # TODO: Add debug logging to methods, optimise iterables, add time metrics
